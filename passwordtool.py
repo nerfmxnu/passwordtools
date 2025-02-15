@@ -1,11 +1,32 @@
 import itertools
 import random
+import os
+
+ascii_art = """
+ ██▓ ███▄ ▄███▓ ▄▄▄        ▄████  ██▓ ███▄    █ ▓█████ 
+▓██▒▓██▒▀█▀ ██▒▒████▄     ██▒ ▀█▒▓██▒ ██ ▀█   █ ▓█   ▀ 
+▒██▒▓██    ▓██░▒██  ▀█▄  ▒██░▄▄▄░▒██▒▓██  ▀█ ██▒▒███   
+░██░▒██    ▒██ ░██▄▄▄▄██ ░▓█  ██▓░██░▓██▒  ▐▌██▒▒▓█  ▄ 
+░██░▒██▒   ░██▒ ▓█   ▓██▒░▒▓███▀▒░██░▒██░   ▓██░░▒████▒
+░▓  ░ ▒░   ░  ░ ▒▒   ▓▒█░ ░▒   ▒ ░▓  ░ ▒░   ▒ ▒ ░░ ▒░ ░
+ ▒ ░░  ░      ░  ▒   ▒▒ ░  ░   ░  ▒ ░░ ░░   ░ ▒░ ░ ░  ░
+ ▒ ░░      ░     ░   ▒   ░ ░   ░  ▒ ░   ░   ░ ░    ░   
+ ░         ░         ░  ░      ░  ░           ░    ░  ░
+
+                      by @nerfmxnu
+"""
 
 common_special_chars = ["!", "@", "#", "_", "-", ".", "$"]
 
 leet_dict = {
     "a": ["4", "@"], "e": ["3"], "i": ["1", "!"], "o": ["0"], 
     "s": ["5", "$"], "l": ["1"], "t": ["7"]
+}
+
+config = {
+    "words": [],
+    "max_passwords": 10000,
+    "output_file": "password_list.txt"
 }
 
 def leet_transform(word):
@@ -78,8 +99,75 @@ def generate_passwords(words, max_passwords=10000, output_file="password_list.tx
 
     return total_passwords
 
-user_input = input("insert keywords: ")
-words_list = user_input.split()
-total_passwords = generate_passwords(words_list)
+def show_help():
+    print("\nAVAILABLE COMMANDS:")
+    print("  set words <word1> <word2> ...   - Set words for password generation")
+    print("  set max <num>                   - Set max number of passwords")
+    print("  set output <filename>            - Set output file")
+    print("  show config                      - Show current settings")
+    print("  run                              - Start password generation")
+    print("  clear                            - Clear the screen")
+    print("  help                             - Show help")
+    print("  exit                             - Exit the program\n")
 
-print(f"\npasswords saved in: password_list.txt ({total_passwords} generate)")
+def main():
+    os.system("cls" if os.name == "nt" else "clear")
+    print(ascii_art)
+
+    while True:
+        cmd = input("Imagine> ").strip().lower()
+        parts = cmd.split(" ", 2)
+
+        if len(parts) < 2 and parts[0] not in ["show", "run", "clear", "help", "exit"]:
+            print("Invalid command. Type 'help' for commands.")
+            continue
+
+        command = parts[0]
+        args = parts[1:] if len(parts) > 1 else []
+
+        if command == "set":
+            if len(args) < 1:
+                print("Usage: set <parameter> <value>")
+                continue
+
+            param = args[0]
+            value = args[1] if len(args) > 1 else None
+
+            if param == "words" and value:
+                config["words"] = value.split()
+                print(f"Words set: {', '.join(config['words'])}")
+            elif param == "max" and value and value.isdigit():
+                config["max_passwords"] = int(value)
+                print(f"Max passwords set: {config['max_passwords']}")
+            elif param == "output" and value:
+                config["output_file"] = value
+                print(f"Output file set: {config['output_file']}")
+            else:
+                print("Unknown parameter. Use 'help' for commands.")
+
+        elif command == "show" and args[0] == "config":
+            print("\nCURRENT CONFIGURATION:")
+            print(f"  Words: {', '.join(config['words']) if config['words'] else 'None'}")
+            print(f"  Max Passwords: {config['max_passwords']}")
+            print(f"  Output File: {config['output_file']}\n")
+
+        elif command == "run":
+            if not config["words"]:
+                print("\nError: No words set. Use 'set words <word1> <word2>' first.")
+                continue
+            total_passwords = generate_passwords(config["words"], config["max_passwords"], config["output_file"])
+            print(f"\nPasswords saved in: {config['output_file']} ({total_passwords} generated)")
+
+        elif command == "clear":
+            os.system("cls" if os.name == "nt" else "clear")
+            print(ascii_art)
+
+        elif command == "help":
+            show_help()
+
+        elif command == "exit":
+            print("\nExiting...")
+            break
+
+if __name__ == "__main__":
+    main()
