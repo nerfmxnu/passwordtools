@@ -78,8 +78,8 @@ def generate_passwords(words, max_passwords=10000, output_file="password_list.tx
 
     return total_passwords
 
-user_input = input("Inserisci parole chiave: ")
+user_input = input("insert keywords: ")
 words_list = user_input.split()
 total_passwords = generate_passwords(words_list)
 
-print(f"\n✅ Password salvate in: password_list.txt ({total_passwords} generate)")
+print(f"\npasswords saved in: password_list.txt ({total_passwords} generate)")
